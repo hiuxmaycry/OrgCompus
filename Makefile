@@ -39,4 +39,4 @@ cleanAll:
 
 .SILENT:
 run:
-	$ ./$(EXEC)
+	$ ./$(EXEC) 126 60 inicial -o salida
