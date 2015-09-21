@@ -1,14 +1,15 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "proximo.h"
+#include "automata.h"
+
 #define MAX_BINARIO 8
-#define REGLA 30
+
 
 void decimal_binario(unsigned int* buffer, int regla, unsigned int largo){
-	unsigned int x,i = 1;
-	for (x = 0; x < largo; x++){
+	for (int x = 0; x < largo; x++){
 		buffer[x] = 0;
 	}
+	unsigned int i = 1;
 	while (regla != 0){
 		buffer[largo - i] = regla % 2;
 		regla = regla / 2;
@@ -18,9 +19,8 @@ void decimal_binario(unsigned int* buffer, int regla, unsigned int largo){
 
 void imprimir_matriz(void* aux,size_t cant_filas,size_t cant_columnas, FILE* out){
 	unsigned char* x = aux;
-	unsigned int i,j;
-	for (i = 0; i < cant_filas; i++){
-		for (j = 0; j < cant_columnas; j++){
+	for (int i = 0; i < cant_filas; i++){
+		for (int j = 0; j < cant_columnas; j++){
 			fprintf(out, "%d ",(x + i*cant_columnas)[j]);
 		}
 		fprintf(out, "\n");
@@ -29,10 +29,9 @@ void imprimir_matriz(void* aux,size_t cant_filas,size_t cant_columnas, FILE* out
 
 void imprimir_matriz_amplificada(void* aux,size_t cant_filas,size_t cant_columnas, FILE* out){
 	unsigned char* x = aux;
-	unsigned int i,j;
-	for (i = 0; i < cant_filas; i++){
-		for (aux = 0; aux < 4; aux++){
-			for (j = 0; j < cant_columnas; j++){
+	for (int i = 0; i < cant_filas; i++){
+		for (int aux = 0; aux < 4; aux++){
+			for (int j = 0; j < cant_columnas; j++){
 				fprintf(out, "%d ",(x + i*cant_columnas)[j]);
 				fprintf(out, "%d ",(x + i*cant_columnas)[j]);
 				fprintf(out, "%d ",(x + i*cant_columnas)[j]);
@@ -45,16 +44,14 @@ void imprimir_matriz_amplificada(void* aux,size_t cant_filas,size_t cant_columna
 
 void inicializar_matriz(void* aux,size_t cant_filas,size_t cant_columnas){
 	unsigned char* x = aux;
-	unsigned int i,j;
-	for (i = 0; i < cant_filas; i++){
-		for (j = 0; j < cant_columnas; j++){
+	for (int i = 0; i < cant_filas; i++){
+		for (int j = 0; j < cant_columnas; j++){
 			(x + i*cant_columnas)[j] = 0;
 		}
 	}
 }
 
-
-/**unsigned char proximo(unsigned char *a, unsigned int i, unsigned int j, unsigned char regla, unsigned int n){
+unsigned char proximo(unsigned char *a, unsigned int i, unsigned int j, unsigned char regla, unsigned int n){
 	unsigned char prox;
 	unsigned char actual = *(a + n * i + j);
 	//Determino el estado de los vecinos
@@ -108,61 +105,13 @@ void inicializar_matriz(void* aux,size_t cant_filas,size_t cant_columnas){
 		prox = buffer[7];
 	}
 	return prox;
-}**/
+}
 
 void calcular_prox_fila(void* matriz, unsigned int fila, unsigned char regla, unsigned int n){
 	unsigned char* a = matriz;
-	unsigned int columna;
-	for(columna = 0; columna < n; columna++){
+	for(unsigned int columna = 0; columna < n; columna++){
 		*(a + n * (fila + 1) + columna) = proximo(a, fila, columna, regla, n);
 	}
 }
 
-int main(){
 
-	// Obtengo la cantidad de celdas
-	int c;
-	unsigned int cantidad = 0;
-	FILE* archivo;
-	archivo = fopen("inicial.txt", "r");
-	while ((c = fgetc(archivo)) != EOF){
-		cantidad++;
-	}
-	if (cantidad == 0){
-                printf("El archivo esta vacio\n");		
-		return 2;
-	} else {
-                cantidad--;
-	}
-	fclose(archivo);
-	// Creo e inicializo la matriz
-	//unsigned char matriz [cantidad][cantidad];
-	unsigned char *matriz = (unsigned char *)malloc(cantidad*cantidad*sizeof(unsigned char));
-	if (matriz == NULL){
-                printf("No se pudo asignar memoria para matriz\n");
-                return 3;
-	}
-	//inicializar_matriz(matriz,cantidad,cantidad);
-	//Escribo el estado inicial en la primera fila de la matriz
-	unsigned int i,fila;
-	archivo = fopen("inicial.txt", "r");
-        for(i=0;i<(cantidad*cantidad);i++){
-                matriz[i]=(unsigned char)0;
-	}
-	for(i=0;i<cantidad;i++){
-                fscanf(archivo, "%c", &(matriz[i]));
-                matriz[i]-=(unsigned char)48;
-	}
-	fclose(archivo);
-	for (fila = 0; fila < (cantidad - 1); fila++){
-		calcular_prox_fila(matriz, fila, REGLA, cantidad);
-	}
-	archivo = fopen("salida.pbm", "wb");
-	fprintf(archivo, "P1\n");
-	fprintf(archivo, "# Esto es una matriz completa\n");
-	fprintf(archivo, "%d %d\n",cantidad*4,cantidad*4);
-	imprimir_matriz_amplificada(matriz,cantidad,cantidad,archivo);
-	fclose(archivo);
-        free(matriz);
-	return 0;
-}
