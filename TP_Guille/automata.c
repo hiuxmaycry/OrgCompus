@@ -17,6 +17,14 @@ void decimal_binario(unsigned int* buffer, int regla, unsigned int largo){
 	}
 }
 
+void imprimir_fila_matriz(void* aux, size_t fila_a_imprimir, size_t cant_columnas, FILE* out){
+	unsigned char* x = aux;
+	for (int j = 0; j < cant_columnas; j++){
+		fprintf(out, "%d", (x + fila_a_imprimir * cant_columnas)[j]);
+	}
+	fprintf(out, "\n");
+}
+
 void imprimir_matriz(void* aux,size_t cant_filas,size_t cant_columnas, FILE* out){
 	unsigned char* x = aux;
 	for (int i = 0; i < cant_filas; i++){
